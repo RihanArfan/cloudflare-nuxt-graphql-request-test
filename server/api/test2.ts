@@ -1,20 +1,21 @@
-import { gql, GraphQLClient } from 'graphql-request'
+import { gql, request } from 'graphql-request'
+import { getFormattedLocale } from '../utils/get-formatted-locale';
 
-export default defineEventHandler(async () => {
-  const endpoint = `https://main--spacex-l4uc6p.apollographos.net/graphql`;
-
-  const graphQLClient = new GraphQLClient(endpoint);
+export default defineEventHandler(async (event) => {
+  const { locale } = getQuery(event);
+  const formatedLocale = getFormattedLocale(locale);
+  const endpoint = useRuntimeConfig().graphqlUrl
 
   const query = gql`
-    {
-      launchLatest {
-        rocket {
-          rocket_name
-          rocket_type
-        }
+    query ExampleQuery($locale: String!) {
+      launchesUpcoming(find: { mission_name: $locale }) {
+        id
+        details
+        launch_date_utc
+        mission_name
       }
     }
   `;
 
-  return await graphQLClient.request(query);
+  return await request(endpoint, query, { locale: formatedLocale });
 });
