@@ -7,12 +7,12 @@ export default defineEventHandler(async (event) => {
   const endpoint = process.env.PAYLOAD_GRAPHQL_URL as string;
 
   const query = gql`
-    query ExampleQuery($idk: String!) {
-      launchLatest {
-        rocket {
-          rocket_name
-          rocket_type
-        }
+    query ExampleQuery($locale: String!) {
+      launchesUpcoming(find: { mission_name: $locale }) {
+        id
+        details
+        launch_date_utc
+        mission_name
       }
     }
   `;
